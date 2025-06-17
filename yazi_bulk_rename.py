@@ -1,7 +1,5 @@
 #!/usr/bin/python3.13
-"""
-Yazi Bulk Rename
-"""
+"""Yazi Bulk Rename"""
 
 import argparse
 
