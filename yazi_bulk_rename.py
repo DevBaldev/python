@@ -33,16 +33,30 @@ def get_args() -> tuple[int, int, str]:
 
 
 def generate_episode_names(start: int, end: int, file_type: str) -> str:
-    """Generate episode names in the format '01.mp4', '10.mp4', etc.,
-       one per line."""
+    """
+    Generate episode names in the format
+    01.mp4
+    10.mp4
+    11.mp4
+    12.mp4
+    02.mp4
+    03.mp4
+    04.mp4
+    05.mp4
+    06.mp4
+    07.mp4
+    08.mp4
+    09.mp4
+    $ ./yazi_bulk_rename.py -t mp4 -s 1 -e 12
+    """
     seen: set[int] = set()
     episode_numbers: list[int] = []
     for i in range(start, end + 1):
         if i not in seen:
             seen.add(i)
             episode_numbers.append(i)
-        j_start: int = i * 10
-        j_end: int = j_start + 10
+        j_start: int = max(i * 10, start)
+        j_end: int = min(i * 10 + 10, end + 1)
         for j in range(j_start, j_end):
             if j not in seen and start <= j <= end:
                 seen.add(j)
