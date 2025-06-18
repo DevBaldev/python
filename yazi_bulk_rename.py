@@ -4,12 +4,6 @@
 import argparse
 
 
-def main() -> None:
-    """Print new names for episodes."""
-    start, end, file_type = get_args()
-    print(generate_episode_names(start, end, file_type))
-
-
 def get_args() -> tuple[int, int, str]:
     """Parse user arguments."""
     parser = argparse.ArgumentParser(description="Yazi bulk renamer.")
@@ -32,7 +26,7 @@ def get_args() -> tuple[int, int, str]:
     return args.start, args.end, args.type
 
 
-def generate_episode_names(start: int, end: int, file_type: str) -> str:
+def generate_episode_names(args: tuple[int, int, str]) -> str:
     """
     Generate episode names in the format
     01.mp4
@@ -50,18 +44,23 @@ def generate_episode_names(start: int, end: int, file_type: str) -> str:
     $ ./yazi_bulk_rename.py -t mp4 -s 1 -e 12
     """
     seen: set[int] = set()
-    episode_numbers: list[int] = []
-    for i in range(start, end + 1):
+    episode_numbers: list[int] = list()
+    for i in range(args[0], args[1] + 1):
         if i not in seen:
             seen.add(i)
             episode_numbers.append(i)
-        j_start: int = max(i * 10, start)
-        j_end: int = min(i * 10 + 10, end + 1)
+        j_start: int = max(i * 10, args[0])
+        j_end: int = min(i * 10 + 10, args[1] + 1)
         for j in range(j_start, j_end):
-            if j not in seen and start <= j <= end:
+            if j not in seen and args[0] <= j <= args[1]:
                 seen.add(j)
                 episode_numbers.append(j)
-    return "\n".join(f"{num:02d}.{file_type}" for num in episode_numbers)
+    return "\n".join(f"{num:02d}.{args[2]}" for num in episode_numbers)
+
+
+def main() -> None:
+    """Print new names for episodes."""
+    print(generate_episode_names(get_args()))
 
 
 if __name__ == "__main__":
