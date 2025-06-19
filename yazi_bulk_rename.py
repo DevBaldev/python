@@ -1,11 +1,16 @@
-#!/usr/bin/python3.13
+#!/usr/bin/env python
 """Yazi Bulk Rename"""
 
 import argparse
 
 
-def get_args() -> tuple[int, int, str]:
-    """Parse user arguments."""
+def get_args():
+    """
+    Parse command-line arguments for the bulk renamer.
+
+    Returns:
+        argparse.Namespace: Parsed arguments with attributes 'start', 'end', 'type'.
+    """
     parser = argparse.ArgumentParser(description="Yazi bulk renamer.")
     parser.add_argument("-s",
                         "--start",
@@ -22,45 +27,49 @@ def get_args() -> tuple[int, int, str]:
                         type=str,
                         default="mp4",
                         help="File extension/type (default: mp4)")
-    args = parser.parse_args()
-    return args.start, args.end, args.type
+    return parser.parse_args()
 
 
-def generate_episode_names(args: tuple[int, int, str]) -> str:
+def generate_episode_names(start, end, ext):
     """
-    Generate episode names in the format
-    01.mp4
-    10.mp4
-    11.mp4
-    12.mp4
-    02.mp4
-    03.mp4
-    04.mp4
-    05.mp4
-    06.mp4
-    07.mp4
-    08.mp4
-    09.mp4
-    $ ./yazi_bulk_rename.py -t mp4 -s 1 -e 12
+    Generate formatted episode names in a custom order.
+
+    The function outputs episode filenames in the form:
+        01.mp4
+        10.mp4
+        11.mp4
+        ...
+    according to a specific ordering logic.
+
+    Args:
+        start (int): The starting episode number (inclusive).
+        end (int): The ending episode number (inclusive).
+        ext (str): The file extension/type.
+
+    Returns:
+        str: Newline-separated string of episode filenames.
     """
-    seen: set[int] = set()
-    episode_numbers: list[int] = list()
-    for i in range(args[0], args[1] + 1):
+    seen = set()
+    order = []
+    for i in range(start, end + 1):
         if i not in seen:
             seen.add(i)
-            episode_numbers.append(i)
-        j_start: int = max(i * 10, args[0])
-        j_end: int = min(i * 10 + 10, args[1] + 1)
-        for j in range(j_start, j_end):
-            if j not in seen and args[0] <= j <= args[1]:
+            order.append(i)
+        for j in range(max(i * 10, start), min(i * 10 + 10, end + 1)):
+            if j not in seen:
                 seen.add(j)
-                episode_numbers.append(j)
-    return "\n".join(f"{num:02d}.{args[2]}" for num in episode_numbers)
+                order.append(j)
+    return "\n".join(f"{n:02d}.{ext}" for n in order)
 
 
-def main() -> None:
-    """Print new names for episodes."""
-    print(generate_episode_names(get_args()))
+def main():
+    """
+    Main entry point for the script.
+
+    Parses arguments and prints the generated episode names.
+    """
+    args = get_args()
+    print(generate_episode_names(args.start, args.end, args.type))
 
 
 if __name__ == "__main__":
